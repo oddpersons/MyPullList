@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
+using System.Xml;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -22,6 +25,9 @@ namespace MyPullList
     /// </summary>
     sealed partial class App : Application
     {
+
+        public DateTime TargetDate;
+
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -39,12 +45,12 @@ namespace MyPullList
         /// <param name="e">Details about the launch request and process.</param>
         protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
-#if DEBUG
-            if (System.Diagnostics.Debugger.IsAttached)
-            {
-                this.DebugSettings.EnableFrameRateCounter = true;
-            }
-#endif
+            //#if DEBUG
+            //            if (System.Diagnostics.Debugger.IsAttached)
+            //            {
+            //                this.DebugSettings.EnableFrameRateCounter = true;
+            //            }
+            //#endif
             Frame rootFrame = Window.Current.Content as Frame;
 
             // Do not repeat app initialization when the Window already has content,
@@ -60,7 +66,7 @@ namespace MyPullList
                 {
                     //TODO: Load state from previously suspended application
                 }
-
+                GetSettings();
                 // Place the frame in the current Window
                 Window.Current.Content = rootFrame;
             }
@@ -101,6 +107,41 @@ namespace MyPullList
             var deferral = e.SuspendingOperation.GetDeferral();
             //TODO: Save application state and stop any background activity
             deferral.Complete();
+        }
+
+        private void GetSettings()
+        {
+            //StorageFolder roamingFolder = ApplicationData.Current.RoamingFolder;
+            ApplicationDataContainer roamingSettings = ApplicationData.Current.LocalSettings;
+
+            string DateKeyName = "LastDate";
+            if (roamingSettings.Values.ContainsKey(DateKeyName)) {
+                TargetDate = DateTime.FromFileTime(long.Parse(roamingSettings.Values[DateKeyName].ToString()));
+            }else
+            {
+                TargetDate = GetWednesday();
+                SaveSettings();
+            }
+        }
+
+        private DateTime GetWednesday()
+        {
+            DateTime today = DateTime.Today;
+            int daysUntilWednessday = ((int)DayOfWeek.Wednesday - (int)today.DayOfWeek) % 7;
+            DateTime NextWednesday = today.AddDays(daysUntilWednessday);
+            return NextWednesday;
+        }
+
+        public void SaveSettings()
+        {
+            ApplicationDataContainer roamingSettings = ApplicationData.Current.LocalSettings;
+            string DateKeyName = "LastDate";
+
+            //KeyValuePair<string, object> newsetting = ;
+            if (roamingSettings.Values.ContainsKey(DateKeyName))
+                roamingSettings.Values[DateKeyName] = TargetDate.ToFileTime();
+            else
+                roamingSettings.Values.Add(new KeyValuePair<string, object>(DateKeyName, TargetDate.ToFileTime()));
         }
     }
 }

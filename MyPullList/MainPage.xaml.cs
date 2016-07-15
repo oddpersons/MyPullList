@@ -22,9 +22,35 @@ namespace MyPullList
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        private string Title = "My Pull List";
+
         public MainPage()
         {
             this.InitializeComponent();
+            App myApp = ((App)Application.Current);
+
+            updateTextBlock();
+        }
+
+        private void NextDate(object sender, RoutedEventArgs e)
+        {
+            App myApp = ((App)Application.Current);
+            myApp.TargetDate = myApp.TargetDate.AddDays(7);
+            updateTextBlock();
+        }
+
+        private void LastDate(object sender, RoutedEventArgs e)
+        {
+            App myApp = ((App)Application.Current);
+            myApp.TargetDate = myApp.TargetDate.AddDays(-7);
+            updateTextBlock();
+        }
+
+        private void updateTextBlock()
+        {
+            App myApp = ((App)Application.Current);
+            TitleBlock.Text = $"{Title} - {myApp.TargetDate.ToString("MM/dd/yyyy")}";
+            myApp.SaveSettings();
         }
     }
 }

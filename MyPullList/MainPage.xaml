@@ -8,6 +8,11 @@
     mc:Ignorable="d">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <TextBlock x:Name="TitleBlock" Margin="25">My Pull List</TextBlock>
+        <Button Content="Last" Margin="233,25,0,583" Click="LastDate" ></Button>
+        <Button Content="Next" Margin="284,25,0,583" Click="NextDate" ></Button>
+        <FlipView Name="testflip" Height = "400" Margin = "10">
+        </FlipView>
 
     </Grid>
 </Page>
